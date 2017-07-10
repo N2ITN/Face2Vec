@@ -1,12 +1,12 @@
-Aberdeen/
-fer2013/
 logs/
 logs_1d/
-raspiviz/
 test/
 haarcascade*
-save.p
-save1D.p
 shape_predictor*
 __pycache__/
+*.p
+*/*jpg
+_DRAW_faces/
 *.pyc
+*.vscode
+faces/Carrie5.JPG
