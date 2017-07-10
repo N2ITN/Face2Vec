@@ -60,10 +60,7 @@ def run_kfold():
 
 def declare_model():
     model = Sequential()
-    model.add(Dense(
-        408, input_shape=(
-            2,
-            68,), init='uniform'))
+    model.add(Dense(408, input_shape=(2, 68, ), init='uniform'))
     model.add(Activation('relu'))
 
     model.add(
@@ -98,7 +95,6 @@ def declare_model():
 def train_model(X_train, y_train, X_test, y_test, load=False):
     model = declare_model()
     filepath = "weights.best.hdf5"
-
     if load == True:
         try:
             model.load_weights(filepath)
@@ -121,13 +117,14 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
         log_dir='./logs/' + now, histogram_freq=1, write_graph=True)
     callbacks_list = [checkpoint, tensorboard]
 
-    model.fit(X_train,
-              y_train,
-              nb_epoch=100,
-              batch_size=17,
-              shuffle='batch',
-              callbacks=callbacks_list,
-              verbose=1)
+    model.fit(
+        X_train,
+        y_train,
+        nb_epoch=100,
+        batch_size=17,
+        shuffle='batch',
+        callbacks=callbacks_list,
+        verbose=1)
     (loss, accuracy) = scores = model.evaluate(X_test, y_test, batch_size=17)
 
     print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
