@@ -7,7 +7,7 @@ Uses computer vision pre-processing to extract facial landmark data from faces, 
 ## Dependencies 
 Tested in Python3 on Linux Mint 18.2
 ```
-sudo apt liboost-all-dev
+sudo apt install libboost-all-dev
 sudo pip install opencv-python
 sudo pip install dlib
 ```

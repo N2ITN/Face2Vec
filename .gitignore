@@ -4,7 +4,6 @@ test/
 haarcascade*
 shape_predictor*
 __pycache__/
-*.p
 *.pyc
 tests.py
 *.vscode
