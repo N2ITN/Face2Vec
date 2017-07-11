@@ -65,7 +65,7 @@ def load_pickle():
 
 def process_name(name):
     if "/" in name:
-        name = name.split('/')[1]
+        name = name.split('/')[-1]
 
     return ''.join([i for i in name.lower().replace('.jpg', '') if i.isalpha()])
 

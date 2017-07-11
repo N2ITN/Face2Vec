@@ -35,9 +35,11 @@ sudo pip install dlib
   The dlib face detector scans the cropped face images to recognize  for images using a more specialized classfier, which as described by the author "is made using the classic Histogram of Oriented Gradients (HOG) feature combined with a linear classifier, an image pyramid, and sliding window detection scheme." http://dlib.net/face_landmark_detection.py.html The HOG based detectors may not be as robust for finding high contrast features as Haar detectors, but they have the advantage of recognizing variations in shading. For this reason, they are implemented as part of dlib's facial keypoint identification.
 
 
+
 But why use two face recognizers?? The Viola Jones recognizer is faster and more accurate at finding a face in a large image space. To find the landmarks, the HOG is mantatory, but using the Viola Jones method first and cropping to the face it finds allows for decreased processing time, because the slower HOG is only looking at a small area.
 
 ![Landmarks Visualized](images/mask.jpg)
+
 
 What is created by facial marks is a standarized 'face mask' of 68 points corresponding to points on each face, like eyebrows, top of the nose, etc. The keypoints are returned in an array or x,y coordinates. This will be the input tensor for the neural network, but first a bit of massaging must be done to ensure accuracy.
 
@@ -76,20 +78,18 @@ While it is definitely possible to throw all these numbers into a neural network
 ```
 
 #### This is not a face
-  But it can represent one to the self-optimizing linear algebra machine we are about to toss it into! Through a bit of old school computer vision we have reduced the feature size dramatically. To quantify this, the size of input image in the example is 242.9 kB, and by using `numpy.nbytes` on the output array we can see that the array we are now dealing with is down to 1088 bytes. In this instance, size of the input to our neural network classifier is 0.44% the size of the original image, a 244x reduction! 
+But it can represent one to the self-optimizing linear algebra machine we are about to toss it into! Through a bit of old school computer vision we have reduced the feature size dramatically. To quantify this, the size of input image in the example is 242.9 kB, and by using `numpy.nbytes` on the output array we can see that the array we are now dealing with is down to 1088 bytes. In this instance, size of the input to our neural network classifier is 0.44% the size of the original image, a 244x reduction! 
 
 
 #### Cache preprocessed training data
 
-  Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files.
+Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files.
 
 
 What is created by facial marks is a standarized 'face mask' of 68 points corresponding to points on each face, like eyebrows, top of the nose, etc. The keypoints are stored in an array associated with a face label. This is the input tensor for the neural network.
 
 #### Cache preprocessed training data
-  All data in training folders are processed and their landmark tensors stored in a pickle file for retrieval upon training.
-
-
+  Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files.
   
 ## Neural network
 
@@ -106,7 +106,6 @@ What is created by facial marks is a standarized 'face mask' of 68 points corres
   This repo comes with a pretrained model and pictures to test (1.6MB)
 
   
-
 
 
 

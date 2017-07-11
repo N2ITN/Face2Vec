@@ -16,7 +16,7 @@ class img_keypoints():
 
         if not hasattr(self.img, 'nbytes'):
 
-            raise Exception('Not a valid image path.')
+            raise Exception(pic + ' is not a valid image path!')
         self.detect_face()
         self.detect_keypoints()
         self.centerPoint = self.keypoints[30]
@@ -98,7 +98,6 @@ class img_keypoints():
         if not self.draw:
             return
         im_out = './' + path + '/' + self.img_name.split('/')[-1]
-        print(im_out)
         cv2.imwrite(im_out, image)
 
     def euc_center(self):
@@ -175,5 +174,3 @@ def check_detectors():
         if not os.path.exists(k):
             print('downloading', k)
             urlretrieve(dl[k], k)
-        else:
-            print('found', k)

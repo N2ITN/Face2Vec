@@ -4,27 +4,13 @@ from random import shuffle
 import numpy as np
 from get_vecs import load_pickle, names, one_pic
 from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.layers import Activation, Convolution1D, Dense, Dropout, Flatten
-from keras.layers.noise import GaussianNoise
 from keras.layers.normalization import BatchNormalization
-from keras.layers.pooling import GlobalAveragePooling1D, GlobalMaxPooling1D
-from keras.models import Sequential
-from keras.optimizers import SGD, Adadelta, Adagrad, Adam
-from keras.regularizers import l2
 from keras.utils import np_utils
-from sklearn.model_selection import StratifiedKFold
-
-X, y = load_pickle()
-X = np.array(X).astype('float64')
-
-y = np_utils.to_categorical(y, 0)
-
-classes = y.shape[1]
-print("classes", classes)
+import define_model
 
 
 def kFold(k):
-
+    """ Orchestrate k-fold xval """
     n = y.shape[0]
     split = n // k
     resid = n % k
@@ -38,7 +24,7 @@ def kFold(k):
 
 
 def subdivide(start, end):
-
+    """ Split up sample groups for k-fold """
     X_test = X[start:end]
     first = X[:start]
     second = X[end:]
@@ -52,54 +38,15 @@ def subdivide(start, end):
 
 
 def run_kfold():
-
+    """ Entry point for training """
     for start, end in kFold(10):
         X_train, y_train, X_test, y_test = subdivide(start, end)
         train_model(X_train, y_train, X_test, y_test, load=True)
 
 
-def declare_model():
-    model = Sequential()
-    model.add(Dense(408, input_shape=(2, 68,), kernel_initializer='uniform'))
-    model.add(Activation('relu'))
-
-    model.add(
-        Dense(
-            204,
-            kernel_initializer='uniform',
-            W_regularizer=l2(0.003),
-            b_regularizer=l2(0.003)
-        )
-    )
-    model.add(Activation('relu'))
-    model.add(Dropout(0.1))
-
-    model.add(Flatten())
-
-    model.add(
-        Dense(
-            51,
-            kernel_initializer='uniform',
-            W_regularizer=l2(0.003),
-            b_regularizer=l2(0.003)
-        )
-    )
-    model.add(Activation('relu'))
-
-    model.add(
-        Dense(
-            classes,
-            kernel_initializer='uniform',
-            W_regularizer=l2(0.003),
-            b_regularizer=l2(0.003)
-        )
-    )
-    model.add(Activation('softmax'))
-    return model
-
-
 def train_model(X_train, y_train, X_test, y_test, load=False):
-    model = declare_model()
+    """ Train, save weights with automatic checkpointing based on time. Includes callbacks to tensorboard """
+    model = define_model.model(n_classes())
     filepath = "weights.best.hdf5"
     if load == True:
         try:
@@ -141,6 +88,7 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
 
 
 def predict(subject):
+    """ Predict the class of a particular image """
     if isinstance(subject, str):
         try:
             X, y = one_pic(subject)
@@ -153,7 +101,7 @@ def predict(subject):
         X = np.array(X).astype('float64')
         label = np.argmax(y)
 
-    model = declare_model()
+    model = define_model.model(n_classes())
     model.load_weights("weights.best.hdf5")
 
     pred = model.predict_classes(X, batch_size=1).tolist()[0]
@@ -167,16 +115,22 @@ def predict(subject):
 
 
 def get_accuracy():
-
+    """ Run all results through prediction and get total accuracy """
     results = [predict((X[i], y[i])) for i in range(y.shape[0])]
     print(results.count(True) / y.shape[0])
 
 
-from keras.utils import plot_model
-plot_model(declare_model(), to_file='model.png', show_shapes=True)
-exit()
-print(y.shape)
-print(X.shape)
-predict('test/Carrie8.jpg')
-# run_kfold()
-# get_accuracy()
+def n_classes():
+    return y.shape[1]
+
+
+if __name__ == '__main__':
+
+    X, y = load_pickle()
+    X = np.array(X).astype('float64')
+    y = np_utils.to_categorical(y, 0)
+    # predict('./faces/Carrie8.JPG')
+
+    # run_kfold()
+
+    get_accuracy()
