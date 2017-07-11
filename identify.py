@@ -21,6 +21,7 @@ class img_keypoints():
         self.detect_keypoints()
         self.centerPoint = self.keypoints[30]
         self.all_euclidian()
+        self.show_keypoints()
 
     def detect_face(self):
         """ Greyscale img, boost contrast, detect faces, extract coords from first face found, convert to dlib rectangle"""
@@ -29,9 +30,19 @@ class img_keypoints():
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(5, 5))
         self.clahe_image = clahe.apply(gray)
+
         self.faceprime = face_cascade.detectMultiScale(self.clahe_image, 1.3, 5)
+        self.write_img('equalized_img', cv2.equalizeHist(self.clahe_image))
+        ''' 
+        If opencv's Haar detector can't find a shape, it's likely dlib can if we pass along the 
+        image. Otherwise, we use the cropped result from opencv 
+        '''
         if len((self.faceprime)) == 0:
             self.faceprime = [[0, 0, self.img.shape[0], self.img.shape[1]]]
+            self.color_normal = self.img
+            self.equalized_img = cv2.equalizeHist(self.clahe_image)
+
+        else:
             self.crop_image()
 
     def crop_image(self):
@@ -46,19 +57,10 @@ class img_keypoints():
 
         # Save cropped face img
         self.color_normal = self.img[y1:y2, x1:x2]
-        ''' 
-        If opencv's Haar detector can't find a shape, it's likely dlib can if we pass along the 
-        image. Otherwise, we use the cropped result from opencv 
-        '''
-        if 0 in self.color_normal.shape:
-            self.color_normal = self.img
-            self.equalized_img = cv2.equalizeHist(self.clahe_image)
-        else:
-            clahe_crop = self.clahe_image[y1:y2, x1:x2]
-            self.equalized_img = cv2.equalizeHist(clahe_crop)
-            self.clahe = clahe_crop
 
-        self.write_img('equalized_img', self.equalized_img)
+        clahe_crop = self.clahe_image[y1:y2, x1:x2]
+        self.equalized_img = cv2.equalizeHist(clahe_crop)
+        self.clahe = clahe_crop
 
     def detect_keypoints(self):
         # Detect face landmarks with dlib rectangle, dlib shape predictor
