@@ -18,12 +18,15 @@ sudo pip install dlib
 ## Pre-Processing Pipeline
   Using the classical computer vision libraries OpenCV2 and Dlib, image are searched for faces. Any faces present are cropped out, and labled wit ha key point detector. These keypoints are stored in 2-dimensional array of size (2,68) representing the euclidian coordinates of each keypoint.
 
+
 ![Original Image](images/og.jpg "Original Image")
 
 #### Clarity boosting:
    Images are greyscaled, and contrast boosted with histogram equalization. This technique will make images clearer by scaling the changes in brightness more evently accross the image.
    
 ![Equalized Image](images/eq.jpg "Equalized Image")
+
+
   
 #### Face detection & cropping
   Next the image is scanned for faces using a Haar Cascade classifier within the Viola-Jones detection algorithm. Developed in 2001, this was the first real-time face detection technique, and has the advantage of being much faster than convolutional neural networks of toady to the detriment of accuracy, versatility, and it's general ability to handle  . As articulated in a more recent paper (https://arxiv.org/pdf/1408.1656.pdf) on mathematical computer vision techniques: "in unconstrained scenes such as faces in a crowd", The Viola Jones fails to "perform well due to large pose variations, illumination variations, occlusions, expression variations, out-of-focus blur, and low image resolution." As the goal of this tutorial is to make a lightweight face recognition algorithm, a classifier that is able to recognize the presence of a face quickly in a moderate diversity of contexts will suffice.
@@ -31,9 +34,12 @@ sudo pip install dlib
  #### Facial landmark extraction
   The dlib face detector scans the cropped face images to recognize  for images using a more specialized classfier, which as described by the author "is made using the classic Histogram of Oriented Gradients (HOG) feature combined with a linear classifier, an image pyramid, and sliding window detection scheme." http://dlib.net/face_landmark_detection.py.html The HOG based detectors may not be as robust for finding high contrast features as Haar detectors, but they have the advantage of recognizing variations in shading. For this reason, they are implemented as part of dlib's facial keypoint identification.
 
-    But why use two face recognizers?? The Viola Jones recognizer is faster and more accurate at finding a face in a large image space. To find the landmarks, the HOG is mantatory, but using the Viola Jones method first and cropping to the face it finds allows for decreased processing time, because the slower HOG is only looking at a small area.
 
-![Landmarks Visualized](images/mask.jpg  "Viola! See what I did there")
+
+But why use two face recognizers?? The Viola Jones recognizer is faster and more accurate at finding a face in a large image space. To find the landmarks, the HOG is mantatory, but using the Viola Jones method first and cropping to the face it finds allows for decreased processing time, because the slower HOG is only looking at a small area.
+
+![Landmarks Visualized](images/mask.jpg)
+
 
 What is created by facial marks is a standarized 'face mask' of 68 points corresponding to points on each face, like eyebrows, top of the nose, etc. The keypoints are returned in an array or x,y coordinates. This will be the input tensor for the neural network, but first a bit of massaging must be done to ensure accuracy.
 
@@ -72,8 +78,15 @@ While it is definitely possible to throw all these numbers into a neural network
 ```
 
 #### This is not a face
-  But it can represent one to the self-optimizing linear algebra machine we are about to toss it into! Through a bit of old school computer vision we have reduced the feature size dramatically. To quantify this, the size of input image in the example is 242.9 kB, and by using `numpy.nbytes` on the output array we can see that the array we are now dealing with is down to 1088 bytes. In this instance, size of the input to our neural network classifier is 0.44% the size of the original image, a 244x reduction! 
+But it can represent one to the self-optimizing linear algebra machine we are about to toss it into! Through a bit of old school computer vision we have reduced the feature size dramatically. To quantify this, the size of input image in the example is 242.9 kB, and by using `numpy.nbytes` on the output array we can see that the array we are now dealing with is down to 1088 bytes. In this instance, size of the input to our neural network classifier is 0.44% the size of the original image, a 244x reduction! 
 
+
+#### Cache preprocessed training data
+
+Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files.
+
+
+What is created by facial marks is a standarized 'face mask' of 68 points corresponding to points on each face, like eyebrows, top of the nose, etc. The keypoints are stored in an array associated with a face label. This is the input tensor for the neural network.
 
 #### Cache preprocessed training data
   Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files.
@@ -82,7 +95,7 @@ While it is definitely possible to throw all these numbers into a neural network
 
   Now time for the deep learning. Using Keras with a Tensorflow backend, I built a fully connected net with several layers.  There was a decent amount of hand tuning involved, and I settled for the following configuration, with L2 bias and weight regularization at each fully connected node. I'm sure this could use more fine tuning, at some point I'd like to do a grid search or other type of hyperparameter optimization.
 
-<img src="./model.png"  width="315" height="885" />
+  <img src="./images/model.png"  width="315" height="885"/>
 
   To ensure traning accuracy I built a simple k-fold cross validation trainer. I found that an `nadam` optimizer worked best. To help visualize training I built in some callbacks for tensorboard.
   
@@ -99,3 +112,5 @@ While it is definitely possible to throw all these numbers into a neural network
 ## Caveats
 
 ## Shout outs
+
+
