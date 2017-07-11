@@ -5,8 +5,6 @@ haarcascade*
 shape_predictor*
 __pycache__/
 *.p
-*/*jpg
-_DRAW_faces/
 *.pyc
 tests.py
 *.vscode
