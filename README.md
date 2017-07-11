@@ -4,7 +4,8 @@ Uses computer vision pre-processing to extract facial landmark data from faces, 
 
 
 
-## Dependencies (tested in Python3 on Linux Mint 18.2)
+## Dependencies 
+Tested in Python3 on Linux Mint 18.2, Mac OSX (boost installed via brew)
 ```
 sudo apt liboost-all-dev
 sudo pip install opencv-python
@@ -34,6 +35,7 @@ What is created by facial marks is a standarized 'face mask' of 68 points corres
   
 ## Neural network
 
+![Neural Net Layers](model.png)
 
 
 
