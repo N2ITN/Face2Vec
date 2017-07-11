@@ -8,5 +8,6 @@ __pycache__/
 */*jpg
 _DRAW_faces/
 *.pyc
+tests.py
 *.vscode
 faces/Carrie5.JPG
