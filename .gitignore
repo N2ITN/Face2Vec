@@ -1,6 +1,5 @@
 logs/
 logs_1d/
-test/
 haarcascade*
 shape_predictor*
 __pycache__/
