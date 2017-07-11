@@ -60,15 +60,17 @@ def run_kfold():
 
 def declare_model():
     model = Sequential()
-    model.add(Dense(408, input_shape=(2, 68, ), init='uniform'))
+    model.add(Dense(408, input_shape=(2, 68,), kernel_initializer='uniform'))
     model.add(Activation('relu'))
 
     model.add(
         Dense(
             204,
-            init='uniform',
+            kernel_initializer='uniform',
             W_regularizer=l2(0.003),
-            b_regularizer=l2(0.003)))
+            b_regularizer=l2(0.003)
+        )
+    )
     model.add(Activation('relu'))
     model.add(Dropout(0.1))
 
@@ -77,17 +79,21 @@ def declare_model():
     model.add(
         Dense(
             51,
-            init='uniform',
+            kernel_initializer='uniform',
             W_regularizer=l2(0.003),
-            b_regularizer=l2(0.003)))
+            b_regularizer=l2(0.003)
+        )
+    )
     model.add(Activation('relu'))
 
     model.add(
         Dense(
             classes,
-            init='uniform',
+            kernel_initializer='uniform',
             W_regularizer=l2(0.003),
-            b_regularizer=l2(0.003)))
+            b_regularizer=l2(0.003)
+        )
+    )
     model.add(Activation('softmax'))
     return model
 
@@ -106,15 +112,18 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
     model.compile(
         loss='categorical_crossentropy',
         optimizer='nadam',
-        metrics=['accuracy'])
+        metrics=['accuracy']
+    )
 
     now = time.strftime("%c")
 
     checkpoint = ModelCheckpoint(
-        filepath, monitor='loss', verbose=1, save_best_only=False, mode='auto')
+        filepath, monitor='loss', verbose=1, save_best_only=False, mode='auto'
+    )
 
     tensorboard = TensorBoard(
-        log_dir='./logs/' + now, histogram_freq=1, write_graph=True)
+        log_dir='./logs/' + now, histogram_freq=1, write_graph=True
+    )
     callbacks_list = [checkpoint, tensorboard]
 
     model.fit(
@@ -124,7 +133,8 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
         batch_size=17,
         shuffle='batch',
         callbacks=callbacks_list,
-        verbose=1)
+        verbose=1
+    )
     (loss, accuracy) = scores = model.evaluate(X_test, y_test, batch_size=17)
 
     print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
@@ -149,13 +159,11 @@ def predict(subject):
     pred = model.predict_classes(X, batch_size=1).tolist()[0]
 
     reverseDict = {i[1]: i[0] for i in names.items()}
-    print(pred == label, 'prediction:', reverseDict[pred], 'actual:',
-          reverseDict[label])
+    print(
+        pred == label, 'prediction:', reverseDict[pred], 'actual:',
+        reverseDict[label]
+    )
     return (pred == label)
-
-
-print(y.shape)
-print(X.shape)
 
 
 def get_accuracy():
@@ -164,6 +172,11 @@ def get_accuracy():
     print(results.count(True) / y.shape[0])
 
 
+from keras.utils import plot_model
+plot_model(declare_model(), to_file='model.png', show_shapes=True)
+exit()
+print(y.shape)
+print(X.shape)
 predict('test/Carrie8.jpg')
 # run_kfold()
 # get_accuracy()

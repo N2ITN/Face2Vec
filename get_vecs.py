@@ -81,11 +81,11 @@ def make_dictionary():
     return {k: v for v, k in enumerate(uniqueList)}, files
 
 
-def main():
+def names_files():
     return make_dictionary()
 
 
-names, files = main()
+names, files = names_files()
 
 
 def rerun_files():

@@ -9,7 +9,7 @@ from sklearn.preprocessing import MaxAbsScaler
 class img_keypoints():
 
     def __init__(self, pic, draw=True):
-
+        check_detectors()
         self.draw = draw
         self.img = cv2.imread(pic)
         self.img_name = pic
@@ -175,6 +175,3 @@ def check_detectors():
             urlretrieve(dl[k], k)
         else:
             print('found', k)
-
-
-check_detectors()
