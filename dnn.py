@@ -1,8 +1,7 @@
 import time
 from random import shuffle
-
 import numpy as np
-from get_vecs import load_pickle, names, one_pic
+from get_vecs import load_pickle, names_files, one_pic
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers.normalization import BatchNormalization
 from keras.utils import np_utils
@@ -37,21 +36,21 @@ def subdivide(start, end):
     return X_train, y_train, X_test, y_test
 
 
-def run_kfold():
+def run_kfold(load=False):
     """ Entry point for training """
     for start, end in kFold(10):
         X_train, y_train, X_test, y_test = subdivide(start, end)
-        train_model(X_train, y_train, X_test, y_test, load=True)
+        train_model(X_train, y_train, X_test, y_test, load=False)
 
 
 def train_model(X_train, y_train, X_test, y_test, load=False):
     """ Train, save weights with automatic checkpointing based on time. Includes callbacks to tensorboard """
-    model = define_model.model(n_classes())
+
     filepath = "weights.best.hdf5"
     if load == True:
         try:
             model.load_weights(filepath)
-        except ValueError:
+        except OSError:
             print("model not reloaded")
         else:
             print("model loaded")
@@ -65,24 +64,26 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
     now = time.strftime("%c")
 
     checkpoint = ModelCheckpoint(
-        filepath, monitor='loss', verbose=1, save_best_only=False, mode='auto'
+        filepath, monitor='loss', verbose=0, save_best_only=False, mode='auto'
     )
 
-    tensorboard = TensorBoard(
-        log_dir='./logs/' + now, histogram_freq=1, write_graph=True
-    )
-    callbacks_list = [checkpoint, tensorboard]
+    # tensorboard = TensorBoard(
+    #     log_dir='./logs/' + now, histogram_freq=1, write_graph=True
+    # )
+    # callbacks_list = [checkpoint, tensorboard]
+    callbacks_list = [checkpoint]
 
     model.fit(
         X_train,
         y_train,
-        nb_epoch=100,
-        batch_size=17,
+        epochs=100,
+        batch_size=15,
         shuffle='batch',
         callbacks=callbacks_list,
         verbose=1
     )
-    (loss, accuracy) = scores = model.evaluate(X_test, y_test, batch_size=17)
+
+    (loss, accuracy) = scores = model.evaluate(X_test, y_test, batch_size=15)
 
     print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
 
@@ -93,20 +94,29 @@ def predict(subject):
         try:
             X, y = one_pic(subject)
             label = y
+
         except RuntimeError:
             return
     else:
         X, y = subject
+
         X = np.expand_dims(X, axis=0)
         X = np.array(X).astype('float64')
-        label = np.argmax(y)
+        label = y
 
     model = define_model.model(n_classes())
-    model.load_weights("weights.best.hdf5")
+    try:
+        model.load_weights("weights.best.hdf5")
+    except OSError:
+        print("creating new weights file")
 
-    pred = model.predict_classes(X, batch_size=1).tolist()[0]
+    pred = model.predict_classes(X, batch_size=1)
 
-    reverseDict = {i[1]: i[0] for i in names.items()}
+    pred = pred.tolist()[0]
+
+    reverseDict = {i[1]: i[0] for i in names_files('train')[0].items()}
+
+    print(pred, label)
     print(
         pred == label, 'prediction:', reverseDict[pred], 'actual:',
         reverseDict[label]
@@ -116,21 +126,31 @@ def predict(subject):
 
 def get_accuracy():
     """ Run all results through prediction and get total accuracy """
-    results = [predict((X[i], y[i])) for i in range(y.shape[0])]
-    print(results.count(True) / y.shape[0])
+    X, y = load_pickle('test')
+    results = [predict((X[i], y[i])) for i in range(len(y))]
+    if results.count(True) > 0:
+        print((results.count(True) / len(y)) * 100, ' percent')
+    else:
+        print('zero percent')
 
 
 def n_classes():
-    return y.shape[1]
+    X, y = load_pickle('train')
+
+    return len(y)
 
 
 if __name__ == '__main__':
 
-    X, y = load_pickle()
-    X = np.array(X).astype('float64')
-    y = np_utils.to_categorical(y, 0)
-    # predict('./faces/Carrie8.JPG')
+    train = True
+    if train:
+        model = define_model.model(n_classes())
+        X, y = load_pickle('train')
+        X = np.array(X).astype('float64')
+        y = np_utils.to_categorical(y, 0)
+        run_kfold()
 
-    # run_kfold()
+    def evaluate():
+        get_accuracy()
 
-    get_accuracy()
+    evaluate()

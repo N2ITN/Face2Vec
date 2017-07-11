@@ -8,7 +8,7 @@ from sklearn.preprocessing import MaxAbsScaler
 
 class img_keypoints():
 
-    def __init__(self, pic, draw=True):
+    def __init__(self, pic, draw=False):
         check_detectors()
         self.draw = draw
         self.img = cv2.imread(pic)

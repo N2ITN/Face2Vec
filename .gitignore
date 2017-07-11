@@ -8,3 +8,5 @@ __pycache__/
 *.pyc
 tests.py
 *.vscode
+draw/
+equalized_img/

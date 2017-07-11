@@ -5,7 +5,7 @@ Uses computer vision pre-processing to extract facial landmark data from faces, 
 
 
 ## Dependencies 
-Tested in Python3 on Linux Mint 18.2, Mac OSX (boost installed via brew)
+Tested in Python3 on Linux Mint 18.2
 ```
 sudo apt liboost-all-dev
 sudo pip install opencv-python
@@ -83,7 +83,7 @@ But it can represent one to the self-optimizing linear algebra machine we are ab
 
 #### Cache preprocessed training data
 
-Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files.
+Next, each picture in the training folder is processed in this manner, and their landmark tensors stored in a pickle file for retrieval upon training. Labels are created by the text in the name of the image files. The algorithm tries to be efficient by loading the stored pickle and only adding new images.
 
 
 What is created by facial marks is a standarized 'face mask' of 68 points corresponding to points on each face, like eyebrows, top of the nose, etc. The keypoints are stored in an array associated with a face label. This is the input tensor for the neural network.
@@ -105,7 +105,9 @@ What is created by facial marks is a standarized 'face mask' of 68 points corres
   `predict(image_path)` will make a prediction on a singular image.
   This repo comes with a pretrained model and pictures to test (1.6MB)
 
-  
+### Results
+Training 100 epochs with 10 different people, with between 4 and 7 pictures per person yielded an average 100% accuracy.
+
 
 
 

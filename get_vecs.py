@@ -14,10 +14,11 @@ def one_pic(img):
     return X, y
 
 
-def save_pickle(limit=10000, load=True, test=False):
+def save_pickle(fname, limit=10000, load=False):
 
     c = []
     v = []
+    names, files = make_dictionary(fname)
 
     for i, x in enumerate(files):
         if i > limit:
@@ -29,8 +30,8 @@ def save_pickle(limit=10000, load=True, test=False):
         try:
             temp = img_keypoints(x)
             temp.show_keypoints()
-            # c.append(temp.euclidian1D + temp.euclidian)
             c.append(temp.tensor)
+
             v.append(category)
 
         except Exception as e:
@@ -40,27 +41,17 @@ def save_pickle(limit=10000, load=True, test=False):
             break
     if load:
 
-        c_old, v_old = load_pickle()
+        c_old, v_old = load_pickle(fname)
         c = c_old + c
         v = v_old + v
 
     arr = [c, v]
 
-    print(type(arr))
-
-    if not test:
-        pickle.dump(arr, open("saveCZ.p", "wb"))
-    else:
-        return arr
+    pickle.dump(arr, open(fname + ".p", "wb"))
 
 
-def load_pickle():
-    data = pickle.load(open("saveCZ.p", "rb"))
-    return data
-
-
-# print(np.array(load_pickle()[0]).shape)
-# print(len(load_pickle()[0]))
+def load_pickle(name):
+    return pickle.load(open(name + ".p", "rb"))
 
 
 def process_name(name):
@@ -70,33 +61,33 @@ def process_name(name):
     return ''.join([i for i in name.lower().replace('.jpg', '') if i.isalpha()])
 
 
-def make_dictionary():
-    files = glob("faces/*")
+def make_dictionary(name):
+    files = glob("./" + name + "/*")
     uniqueSet = set()
     names = [uniqueSet.add(process_name(x)) for i, x in enumerate(files)]
-
     uniqueList = list(uniqueSet)
     uniqueList.sort()
 
     return {k: v for v, k in enumerate(uniqueList)}, files
 
 
-def names_files():
-    return make_dictionary()
-
-
-names, files = names_files()
+def names_files(name):
+    return make_dictionary(name)
 
 
 def rerun_files():
-    s = save_pickle(load=False, test=False)
+    save_pickle(load=False, fname='test')
+    save_pickle(load=False, fname='train')
 
 
 def examine_cached():
-    X, y = load_pickle()
+    for i in ['train', 'test']:
+        X, y = load_pickle(i)
+        print([i.shape for i in X])
+        print(y)
 
-    print(X[0].shape)
 
-
-# save_pickle(load=False, test=False )
-# examine_cached()
+if __name__ == '__main__':
+    # rerun_files()
+    print({i[1]: i[0] for i in names_files('train')[0].items()})
+    print({i[1]: i[0] for i in names_files('test')[0].items()})
