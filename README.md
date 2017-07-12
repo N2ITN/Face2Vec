@@ -106,8 +106,15 @@ What is created by facial marks is a standarized 'face mask' of 68 points corres
   This repo comes with a pretrained model and pictures to test (1.6MB)
 
 ### Results
-Training 100 epochs with 10 different people, with between 4 and 7 pictures per person yielded an average 100% accuracy.
+Training 100 epochs with 10 different people, with between 4 and 7 pictures per person yielded an average 100% accuracy on training data. Test data is not so accurate, with current data size.
 
+
+### TODO
+[ ] Acquire more training data
+[ ] Refine net parameters
+[ ] Add confusion matrix for additional analysis
+[ ] Create Jupyter notebook with annotations
+[ ] Dockerize repo with dependencies and notebook
 
 
 
