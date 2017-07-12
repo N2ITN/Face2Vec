@@ -110,11 +110,11 @@ Training 100 epochs with 10 different people, with between 4 and 7 pictures per 
 
 
 ### TODO
-[ ] Acquire more training data
-[ ] Refine net parameters
-[ ] Add confusion matrix for additional analysis
-[ ] Create Jupyter notebook with annotations
-[ ] Dockerize repo with dependencies and notebook
+- [ ] Acquire more training data
+- [ ] Refine net parameters, display results
+- [ ] Add confusion matrix function for additional analysis
+- [ ] Create Jupyter notebook with annotations
+- [ ] Dockerize repo with dependencies and notebook
 
 
 
