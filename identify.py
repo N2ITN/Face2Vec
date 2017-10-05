@@ -19,6 +19,9 @@ class img_keypoints():
             raise Exception(pic + ' is not a valid image path!')
         self.detect_face()
         self.detect_keypoints()
+        self.show_keypoints()
+
+    def geom(self):
         self.centerPoint = self.keypoints[30]
         self.all_euclidian()
         self.show_keypoints()
@@ -65,9 +68,7 @@ class img_keypoints():
     def detect_keypoints(self):
         # Detect face landmarks with dlib rectangle, dlib shape predictor
         detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor(
-            'shape_predictor_68_face_landmarks.dat'
-        )
+        predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
         dets = detector(self.equalized_img, 1)
         # shape = predictor(self.clahe,1)
         for k, d in enumerate(dets):
@@ -77,21 +78,18 @@ class img_keypoints():
             # Get the landmarks/parts for the face in box d.
             self.shape = predictor(self.img, d)
 
-            self.keypoints = [(shape.part(i).x, shape.part(i).y)
-                              for i in range(shape.num_parts)]
+            self.keypoints = [(shape.part(i).x, shape.part(i).y) for i in range(shape.num_parts)]
 
         return self.keypoints
+
+    def keypoints_mask(self):
+        print(self.keypoints)
 
     def show_keypoints(self):
         # shape = self.shape
         for i in range(1, 68):
 
-            cv2.circle(
-                self.color_normal,
-                self.keypoints[i],
-                1, (0, 235, 235),
-                thickness=2
-            )
+            cv2.circle(self.color_normal, self.keypoints[i], 1, (0, 235, 235), thickness=2)
         self.write_img('draw', self.color_normal)
 
     def write_img(self, path, image):
@@ -102,10 +100,7 @@ class img_keypoints():
 
     def euc_center(self):
 
-        euclidian = [
-            self.distance_2D(self.centerPoint, point)
-            for point in self.keypoints
-        ]
+        euclidian = [self.distance_2D(self.centerPoint, point) for point in self.keypoints]
         euclidian = np.array(euclidian).reshape(-1, 1)
         norm = MaxAbsScaler().fit_transform(euclidian)
         self.euclidian = norm
@@ -113,10 +108,7 @@ class img_keypoints():
     def euc_xy(self):
         euclidian1D = []
 
-        [
-            euclidian1D.append(self.distance_1D(self.centerPoint, point))
-            for point in self.keypoints
-        ]
+        [euclidian1D.append(self.distance_1D(self.centerPoint, point)) for point in self.keypoints]
 
         x, y = [x for x in zip(*euclidian1D)]
 
@@ -131,8 +123,7 @@ class img_keypoints():
     def all_euclidian(self):
         self.euc_xy()
         self.euc_center()
-        self.tensor = np.rot90(np.hstack((self.euclidianX, self.euclidianY))
-                              )  #, self.euclidian)))
+        self.tensor = np.rot90(np.hstack((self.euclidianX, self.euclidianY, dself.euclidian)))
 
     def distance_1D(self, a, b):
         """ Return x,y distance between 2 coordinate pairs, assistant function to array_maker """
@@ -149,6 +140,7 @@ class img_keypoints():
         a = np.array((x1, y1))
         b = np.array((x2, y2))
         dist = np.linalg.norm(a - b)
+
         return dist
 
 

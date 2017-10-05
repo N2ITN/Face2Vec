@@ -55,17 +55,11 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
         else:
             print("model loaded")
 
-    model.compile(
-        loss='categorical_crossentropy',
-        optimizer='nadam',
-        metrics=['accuracy']
-    )
+    model.compile(loss='categorical_crossentropy', optimizer='nadam', metrics=['accuracy'])
 
     now = time.strftime("%c")
 
-    checkpoint = ModelCheckpoint(
-        filepath, monitor='loss', verbose=0, save_best_only=False, mode='auto'
-    )
+    checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_best_only=True, mode='auto')
 
     # tensorboard = TensorBoard(
     #     log_dir='./logs/' + now, histogram_freq=1, write_graph=True
@@ -77,13 +71,12 @@ def train_model(X_train, y_train, X_test, y_test, load=False):
         X_train,
         y_train,
         epochs=100,
-        batch_size=15,
+        batch_size=10,
         shuffle='batch',
         callbacks=callbacks_list,
-        verbose=1
-    )
+        verbose=1)
 
-    (loss, accuracy) = scores = model.evaluate(X_test, y_test, batch_size=15)
+    (loss, accuracy) = scores = model.evaluate(X_test, y_test, batch_size=10)
 
     print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
 
@@ -117,10 +110,7 @@ def predict(subject):
     reverseDict = {i[1]: i[0] for i in names_files('train')[0].items()}
 
     print(pred, label)
-    print(
-        pred == label, 'prediction:', reverseDict[pred], 'actual:',
-        reverseDict[label]
-    )
+    print(pred == label, 'prediction:', reverseDict[pred], 'actual:', reverseDict[label])
     return (pred == label)
 
 
@@ -137,7 +127,7 @@ def get_accuracy():
 def n_classes():
     X, y = load_pickle('train')
 
-    return len(y)
+    return len(set(y))
 
 
 if __name__ == '__main__':

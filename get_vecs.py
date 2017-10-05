@@ -83,11 +83,13 @@ def rerun_files():
 def examine_cached():
     for i in ['train', 'test']:
         X, y = load_pickle(i)
-        print([i.shape for i in X])
-        print(y)
+        print(set([i.shape for i in X]))
+        print(len(y))
+        # print(X.shape)
 
 
 if __name__ == '__main__':
-    # rerun_files()
-    print({i[1]: i[0] for i in names_files('train')[0].items()})
-    print({i[1]: i[0] for i in names_files('test')[0].items()})
+    rerun_files()
+    # print({i[1]: i[0] for i in names_files('train')[0].items()})
+    # print({i[1]: i[0] for i in names_files('test')[0].items()})
+    # examine_cached()
