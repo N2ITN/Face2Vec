@@ -1,6 +1,7 @@
 # Face2Vec
 A fast and accurate method for facial recognition that can be trained an run on a laptop.
 Uses computer vision pre-processing to extract facial landmark data from faces, and trains 
+Based on earlier work using CV for drowsiness detection on a raspberry pi https://github.com/N2ITN/RPiViz
 
 
 
