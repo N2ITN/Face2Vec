@@ -112,15 +112,12 @@ Training 100 epochs with 10 different people, with between 4 and 7 pictures per 
 
 ### TODO
 - [ ] Acquire more training data
-- [ ] Refine net parameters, display results
+- [ ] Address over-fitting with cross validation and hyperparameter optimization 
 - [ ] Add confusion matrix function for additional analysis
 - [ ] Create Jupyter notebook with annotations
 - [ ] Dockerize repo with dependencies and notebook
 
 
 
-## Caveats
-
-## Shout outs
 
 
