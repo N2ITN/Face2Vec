@@ -1,5 +1,5 @@
 dlib==19.1.0
 Keras==1.2.1
-numpy==1.12.0
+numpy==1.22.0
 cv2==1.0
 scikit_learn==0.18.1
